@@ -119,24 +119,44 @@ h1 em,h2 em,h3 em{font-style:italic;font-weight:600;color:var(--accent)}
 /* ============ LOADER ============ */
 #loader{
   position:fixed;inset:0;z-index:9999;
-  background:var(--bg);
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 18%, rgba(191,252,255,.28), transparent 60%),
+    radial-gradient(ellipse 80% 55% at 50% 100%, rgba(168,121,0,.14), transparent 62%),
+    var(--bg);
   display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:32px;
+  gap:26px;overflow:hidden;
 }
-.loader-ornament{width:clamp(160px,22vw,240px);height:auto;opacity:.4}
+.loader-inner{display:flex;flex-direction:column;align-items:center;gap:22px;position:relative}
+.loader-ring{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:clamp(240px,54vw,340px);height:clamp(240px,54vw,340px);
+  border-radius:50%;border:1px solid var(--hair-gold);
+  pointer-events:none;
+}
+.loader-ring::before{
+  content:"";position:absolute;inset:-1px;border-radius:50%;
+  border:1px solid transparent;border-top-color:var(--gold);border-right-color:var(--cyan-deep);
+  animation:loaderSpin 2.6s linear infinite;
+}
+@keyframes loaderSpin{to{transform:rotate(360deg)}}
+.loader-ornament{width:clamp(150px,22vw,220px);height:auto;opacity:.5}
 .loader-mono{
-  font-family:var(--script);font-size:clamp(88px,16vw,160px);
+  font-family:var(--script);font-size:clamp(82px,15vw,150px);
   color:var(--accent-deep);line-height:.9;
 }
 .loader-mono .amp{color:var(--gold);font-size:.6em;padding:0 .08em;vertical-align:middle}
-.loader-line{
-  font-family:var(--sans);font-size:10px;letter-spacing:.65em;font-weight:400;
-  text-transform:uppercase;color:var(--ink-soft);padding-left:.65em;
+.loader-names{
+  font-family:var(--display);font-size:clamp(17px,2.4vw,21px);font-style:italic;
+  font-weight:500;color:var(--accent);letter-spacing:.02em;
 }
-.loader-bar{width:120px;height:1px;background:var(--hair);position:relative;overflow:hidden}
+.loader-line{
+  font-family:var(--sans);font-size:11px;letter-spacing:.55em;font-weight:600;
+  text-transform:uppercase;color:var(--gold-deep);padding-left:.55em;
+}
+.loader-bar{width:130px;height:1px;background:var(--hair);position:relative;overflow:hidden;margin-top:2px}
 .loader-bar::after{
   content:"";position:absolute;inset:0;
-  background:linear-gradient(to right, transparent, var(--gold), transparent);
+  background:linear-gradient(to right, transparent, var(--gold), var(--cyan-deep), transparent);
   transform:translateX(-100%);
   animation:loaderBar 1.6s ease-in-out infinite;
 }
@@ -1189,46 +1209,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
   .hero-scroll::after{animation:none}
 }
 
-/* ============ ENVELOPE OPENING SEQUENCE ============ */
-#loader{display:none !important}
+/* ============ INTRO — WRAP OCULTO HASTA EL LOADER ============ */
 .wrap{visibility:hidden}
-
-#envelope-screen{
-  position:fixed;inset:0;z-index:9998;
-  background:#fff;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer;overflow:hidden;
-}
-#env-image,#env-video{
-  position:absolute;inset:0;
-  width:100%;height:100%;
-  object-fit:cover;object-position:center;
-  transform:scale(1.18);
-}
-#env-image{opacity:0;z-index:1}
-#env-video{opacity:0;z-index:2;pointer-events:none}
-#env-hint{
-  position:absolute;bottom:min(9vh,80px);left:50%;transform:translateX(-50%);
-  font-family:var(--sans);font-size:14px;font-weight:500;
-  letter-spacing:.5em;text-transform:uppercase;
-  color:#F8F5EC;padding:14px 28px 14px 28.5px;z-index:3;
-  background:rgba(30,47,78,.88);
-  border:1px solid rgba(232,213,160,.55);
-  border-radius:999px;
-  box-shadow:0 8px 28px rgba(30,47,78,.35),0 0 0 6px rgba(255,255,255,.08);
-  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
-  animation:envHintPulse 1.8s ease-in-out infinite;
-  user-select:none;pointer-events:none;
-  white-space:nowrap;
-}
-@keyframes envHintPulse{
-  0%,100%{opacity:.92;transform:translateX(-50%) scale(1);box-shadow:0 8px 28px rgba(30,47,78,.35),0 0 0 6px rgba(255,255,255,.08)}
-  50%{opacity:1;transform:translateX(-50%) scale(1.05);box-shadow:0 10px 36px rgba(30,47,78,.48),0 0 0 10px rgba(255,255,255,.14)}
-}
-#env-flash{
-  position:fixed;inset:0;z-index:9999;
-  background:#fff;opacity:0;pointer-events:none;
-}
 
 /* ============ LIGHTBOX — rueda de fotos ============ */
 .wheel-item-inner{cursor:zoom-in}
@@ -1508,29 +1490,23 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--gold);outline-offse
 </head>
 <body>
 
-<!-- ENVELOPE OPENING SEQUENCE -->
-<div id="envelope-screen" role="button" aria-label="Toca para abrir la invitación" tabindex="0">
-  <img id="env-image" src="envelope.png" alt="">
-  <video id="env-video" muted playsinline preload="auto">
-    <source src="envelope.mp4" type="video/mp4">
-  </video>
-  <div id="env-hint">Toca para abrir</div>
-</div>
-<div id="env-flash" aria-hidden="true"></div>
-
 <!-- LOADER -->
-<div id="loader">
-  <svg class="loader-ornament" viewBox="0 0 240 60" fill="none" aria-hidden="true">
-    <g stroke="var(--gold)" stroke-width=".9" fill="none">
-      <path d="M20 30 Q60 10 90 30 Q110 45 120 30 Q130 15 150 30 Q180 50 220 30"/>
-      <circle cx="120" cy="30" r="3" fill="var(--gold)"/>
-      <path d="M118 22 Q120 17 122 22" opacity=".7"/>
-      <path d="M118 38 Q120 43 122 38" opacity=".7"/>
-    </g>
-  </svg>
-  <div class="loader-mono">B<span class="amp">&amp;</span>M</div>
-  <div class="loader-line">Nos casamos · 2027</div>
-  <div class="loader-bar"></div>
+<div id="loader" role="status" aria-label="Cargando la invitación">
+  <span class="loader-ring" aria-hidden="true"></span>
+  <div class="loader-inner">
+    <svg class="loader-ornament" viewBox="0 0 240 60" fill="none" aria-hidden="true">
+      <g stroke="var(--gold)" stroke-width=".9" fill="none">
+        <path d="M20 30 Q60 10 90 30 Q110 45 120 30 Q130 15 150 30 Q180 50 220 30"/>
+        <circle cx="120" cy="30" r="3" fill="var(--gold)"/>
+        <path d="M118 22 Q120 17 122 22" opacity=".7"/>
+        <path d="M118 38 Q120 43 122 38" opacity=".7"/>
+      </g>
+    </svg>
+    <div class="loader-mono">B<span class="amp">&amp;</span>M</div>
+    <div class="loader-names">Brenda &amp; Mauricio</div>
+    <div class="loader-line">29 · 05 · 2027</div>
+    <div class="loader-bar"></div>
+  </div>
 </div>
 
 <!-- MUSIC -->
@@ -2310,107 +2286,48 @@ function launchInvitation(){
   if(window.ScrollTrigger) ScrollTrigger.refresh();
 }
 
-// ------ ENVELOPE OPENING SEQUENCE ------
+// ------ LOADER INTRO (auto-cierre + tap para saltar) ------
 (function(){
-  const envScreen = document.getElementById('envelope-screen');
-  const envImage  = document.getElementById('env-image');
-  const envVideo  = document.getElementById('env-video');
-  const envHint   = document.getElementById('env-hint');
-  const envFlash  = document.getElementById('env-flash');
-  const wrap      = document.querySelector('.wrap');
+  const loader = document.getElementById('loader');
+  const wrap   = document.querySelector('.wrap');
+  if(!wrap){ return; }
 
-  if(!envScreen || !wrap) {
-    if(wrap) wrap.style.visibility = 'visible';
-    return;
+  let revealed = false;
+  let autoTimer = null;
+
+  // entrada elegante de los elementos del loader
+  if(loader){
+    gsap.fromTo('.loader-inner > *',
+      {opacity:0,y:16},
+      {opacity:1,y:0,duration:1,stagger:.13,ease:'power3.out',delay:.15});
+    gsap.fromTo('.loader-ring',{opacity:0,scale:.85},{opacity:1,scale:1,duration:1.2,ease:'power2.out',delay:.1});
   }
 
-  let opened  = false;
-  let flashed = false;
-  let safetyTimer = null;
-
-  if(envImage) gsap.fromTo(envImage,{opacity:0},{opacity:1,duration:1,ease:'power2.out',delay:.2});
-
-  function revealInvitation(){
-    envScreen.style.display = 'none';
+  function reveal(){
+    if(revealed) return;
+    revealed = true;
+    if(autoTimer){ clearTimeout(autoTimer); autoTimer = null; }
     wrap.style.visibility = 'visible';
     try { launchInvitation(); } catch(e){}
     try { startMusic(); } catch(e){}
-    if(envFlash){
-      gsap.to(envFlash,{opacity:0,duration:1.2,ease:'power2.inOut',delay:.1,
-        onComplete:()=>{envFlash.style.display='none'}});
+    if(loader){
+      gsap.to(loader,{opacity:0,duration:.9,ease:'power2.inOut',
+        onComplete:function(){ loader.style.display='none'; }});
     }
   }
 
-  function triggerFlash(){
-    if(flashed) return;
-    flashed = true;
-    if(safetyTimer) { clearTimeout(safetyTimer); safetyTimer = null; }
+  // auto-cierre tras la animación del loader
+  autoTimer = setTimeout(reveal, 2700);
 
-    if(envFlash){
-      gsap.to(envFlash,{
-        opacity:1, duration:1.4, ease:'power2.inOut',
-        onComplete: revealInvitation
-      });
-    } else {
-      revealInvitation();
+  // tocar el loader adelanta la entrada y desbloquea el audio con sonido
+  if(loader){
+    function skip(){
+      if(musicEl){ try { setMusicStart(); musicEl.play().catch(function(){}); } catch(e){} }
+      reveal();
     }
+    loader.addEventListener('click', skip);
+    loader.addEventListener('touchstart', skip, {passive:true});
   }
-
-  function onTimeUpdate(){
-    if(flashed) return;
-    const dur = envVideo.duration;
-    if(!isFinite(dur) || dur <= 0) return;
-    if(envVideo.currentTime >= dur - 2) triggerFlash();
-  }
-
-  function openEnvelope(){
-    if(opened) return;
-    opened = true;
-
-    // Desbloquear audio síncronamente (iOS requiere play() dentro del gesto)
-    if(musicEl){
-      try {
-        setMusicStart();
-        musicEl.play().catch(function(){});
-      } catch(e){}
-    }
-
-    if(envHint) gsap.to(envHint,{opacity:0,duration:.35,ease:'power2.out'});
-
-    if(envVideo && envVideo.querySelector('source')){
-      envVideo.currentTime = 0;
-      var playOk = false;
-      var p = envVideo.play();
-      if(p && typeof p.then === 'function'){
-        p.then(function(){ playOk = true; }).catch(function(){ triggerFlash(); });
-      }
-
-      if(envImage){
-        gsap.to(envImage,{opacity:0,duration:.7,ease:'power2.inOut',
-          onComplete:function(){envImage.style.display='none'}});
-      }
-      gsap.to(envVideo,{opacity:1,duration:.7,ease:'power2.inOut'});
-
-      envVideo.addEventListener('timeupdate', onTimeUpdate);
-      envVideo.addEventListener('ended', triggerFlash);
-
-      var dur = envVideo.duration;
-      var timeout = (isFinite(dur) && dur > 0) ? (dur * 1000 + 3000) : 12000;
-      safetyTimer = setTimeout(triggerFlash, timeout);
-
-      setTimeout(function(){
-        if(!flashed && envVideo.paused && envVideo.currentTime < 0.5) triggerFlash();
-      }, 2000);
-    } else {
-      triggerFlash();
-    }
-  }
-
-  envScreen.addEventListener('click', openEnvelope);
-  envScreen.addEventListener('touchstart', openEnvelope, {passive:true});
-  envScreen.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' || e.key === ' ') openEnvelope();
-  });
 })();
 
 // ------ HERO PARALLAX — único scrub, transform GPU ------
